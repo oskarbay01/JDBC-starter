@@ -2,6 +2,7 @@ package com.jdbc.starter;
 
 import com.jdbc.starter.util.ConnectionManager;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,6 +18,28 @@ public class PrepareStatementRunner {
 
         var result1 = getFlightsBetween(LocalDate.of(2020, 1, 1).atStartOfDay(), LocalDateTime.now());
         System.out.println(result1);
+
+        checkMetaData();
+    }
+
+    private static void checkMetaData() throws SQLException {
+        try (var connection = ConnectionManager.open()) {
+            var metaData = connection.getMetaData();
+            var catalogs = metaData.getCatalogs();
+            while (catalogs.next()) {
+                System.out.println(catalogs.getString(1));
+
+                var schemas = metaData.getSchemas();
+                while (schemas.next()) {
+                    System.out.println(schemas.getString("TABLE_SCHEM"));
+                }
+                System.out.println();
+                var tables = metaData.getTables(null, null, "%", null);
+                while (tables.next()) {
+                    System.out.println(tables.getString("TABLE_NAME"));
+                }
+            }
+        }
     }
 
     private static List<Long> getFlightsBetween(LocalDateTime start, LocalDateTime end) throws SQLException {
@@ -40,7 +63,7 @@ public class PrepareStatementRunner {
             var resultSet = prepareStatement.executeQuery();
             while (resultSet.next()) {
                 result.add(
-                        resultSet.getObject(1,Long.class)
+                        resultSet.getObject(1, Long.class)
                 );
             }
         }
@@ -59,6 +82,8 @@ public class PrepareStatementRunner {
         List<Long> result = new ArrayList<>();
         try (var connection = ConnectionManager.open();
              var prepareStatement = connection.prepareStatement(sql)) {
+            prepareStatement.setFetchSize(50);
+            prepareStatement.setQueryTimeout(10);
             prepareStatement.setLong(1, flight);
 
             // Этот интерфейс представляет результирующий набор базы данных

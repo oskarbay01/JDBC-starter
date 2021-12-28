@@ -19,6 +19,7 @@ public class JdbcRunner {
                 """;
 
         try (var connection = ConnectionManager.open();
+            // Statement - этот интерфейс используется для доступа к БД для общих целей
              var statement = connection.createStatement();
         ) {
             System.out.println(connection.getSchema());
