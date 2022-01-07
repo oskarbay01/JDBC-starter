@@ -18,7 +18,7 @@ public class JdbcRunner {
                 SELECT * FROM ticket;
                 """;
 
-        try (var connection = ConnectionManager.open();
+        try (var connection = ConnectionManager.get();
             // Statement - этот интерфейс используется для доступа к БД для общих целей
              var statement = connection.createStatement();
         ) {

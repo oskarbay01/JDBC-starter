@@ -23,7 +23,7 @@ public class PrepareStatementRunner {
     }
 
     private static void checkMetaData() throws SQLException {
-        try (var connection = ConnectionManager.open()) {
+        try (var connection = ConnectionManager.get()) {
             var metaData = connection.getMetaData();
             var catalogs = metaData.getCatalogs();
             while (catalogs.next()) {
@@ -50,7 +50,7 @@ public class PrepareStatementRunner {
                 """;
 
         List<Long> result = new ArrayList<>();
-        try (var connection = ConnectionManager.open();
+        try (var connection = ConnectionManager.get();
              var prepareStatement = connection.prepareStatement(sql)) {
             System.out.println(prepareStatement);
 
@@ -80,7 +80,7 @@ public class PrepareStatementRunner {
                 """;
 
         List<Long> result = new ArrayList<>();
-        try (var connection = ConnectionManager.open();
+        try (var connection = ConnectionManager.get();
              var prepareStatement = connection.prepareStatement(sql)) {
             prepareStatement.setFetchSize(50);
             prepareStatement.setQueryTimeout(10);
